@@ -190,6 +190,19 @@ with dai.Device(pipeline) as device:
 
     p = [100, 100, 0]
 
+    # setup scatter plot
+
+    plt.ion()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+
+    plot = ax.scatter([], [], [])
+
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    ax.set_zlim(-1, 1)
+
     while True:
         inRgb = video.get()
         if inRgb is not None:
@@ -239,6 +252,37 @@ with dai.Device(pipeline) as device:
                     )
 
                     if corners is not None:
+
+                        array = np.array(plot._offsets3d).T
+
+                        new_array = np.vstack(
+                            (
+                                array,
+                                [
+                                    depthData.spatialCoordinates.x,
+                                    depthData.spatialCoordinates.y,
+                                    depthData.spatialCoordinates.z,
+                                ],
+                            )
+                        )
+
+                        plot._offsets3d = (
+                            new_array[:, 0],
+                            new_array[:, 1],
+                            new_array[:, 2],
+                        )
+
+                        ax.set_xlim(
+                            new_array[:, 0].min() - 100, new_array[:, 0].max() + 100
+                        )
+                        ax.set_ylim(
+                            new_array[:, 1].min() - 100, new_array[:, 1].max() + 100
+                        )
+                        ax.set_zlim(
+                            new_array[:, 2].min() - 100, new_array[:, 2].max() + 100
+                        )
+
+                        fig.canvas.draw()
 
                         cv2.putText(
                             rgbFrame,
