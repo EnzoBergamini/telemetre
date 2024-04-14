@@ -23,11 +23,11 @@ def detect_markers(frame, dist, mtx, aruco_dict, detector_parameters, size_of_ma
 
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-    corners, ids, rejectedImgPoints = aruco.detectMarkers(
+    corners, ids, _ = aruco.detectMarkers(
         frame_gray, aruco_dict, parameters=detector_parameters
     )
 
-    rvecs, tvecs, trash = aruco.estimatePoseSingleMarkers(
+    rvecs, tvecs, _ = aruco.estimatePoseSingleMarkers(
         corners, size_of_marker, mtx, dist
     )
 
