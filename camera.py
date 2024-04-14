@@ -1,5 +1,6 @@
 import cv2
 import depthai as dai
+import numpy as np
 
 
 class camera:
@@ -91,3 +92,36 @@ class camera:
         self.stereo.passThrough.link(self.linkOut["stereo"].input)
 
         self.linkIn["locationConfig"].out.link(self.location.inputConfig)
+
+    def start(self) -> None:
+
+        self.device = dai.Device(self.pipeline)
+        self.device.startPipeline()
+
+    def setup_calib_parameters(
+        self, width_A=1920, height_A=1080, width_BC=640, height_BC=480
+    ) -> None:
+
+        self.calib_data = self.device.readCalibration()
+
+        self.intrinsics_matrix_rgb = np.array(
+            self.calib_data.getCameraIntrinsics(
+                dai.CameraBoardSocket.CAM_A, width_A, height_A
+            )
+        )
+
+        self.intrinsics_matrix_right = np.array(
+            self.calib_data.getCameraIntrinsics(
+                dai.CameraBoardSocket.CAM_C, width_BC, height_BC
+            )
+        )
+
+        self.distortion_coefficients_rgb = np.array(
+            self.calib_data.getDistortionCoefficients(dai.CameraBoardSocket.CAM_A)
+        )
+
+        self.extrinsic_matrix_right = np.array(
+            self.calib_data.getCameraExtrinsics(
+                dai.CameraBoardSocket.CAM_A, dai.CameraBoardSocket.CAM_C
+            )
+        )
