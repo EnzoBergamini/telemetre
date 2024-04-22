@@ -8,9 +8,17 @@ class camera:
 
         self.pipeline = dai.Pipeline()
         self.setup_camera_A()
+        print("Camera A setup")
         self.setup_camera_B()
+        print("Camera B setup")
         self.setup_camera_C()
+        print("Camera C setup")
+        self.setup_stereo()
+        print("Stereo setup")
+        self.setup_location()
+        print("Location setup")
         self.setup_links()
+        print("Links setup")
 
     def setup_camera_A(
         self,
@@ -20,7 +28,7 @@ class camera:
 
         self.rgb = self.pipeline.createColorCamera()
 
-        self.rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+        self.rgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)
         self.rgb.setResolution(dai_resolution)
         self.rgb.setInterleaved(False)
         self.rgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
@@ -39,13 +47,13 @@ class camera:
 
         self.right = self.pipeline.createMonoCamera()
 
-        self.right.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+        self.right.setBoardSocket(dai.CameraBoardSocket.CAM_C)
         self.right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_480_P)
 
     def setup_stereo(self) -> None:
 
         self.stereo = self.pipeline.createStereoDepth()
-        self.depstereoth.setConfidenceThreshold(200)
+        self.stereo.setConfidenceThreshold(200)
         self.stereo.setLeftRightCheck(True)
         self.stereo.setExtendedDisparity(False)
         self.stereo.setSubpixel(False)
@@ -56,11 +64,12 @@ class camera:
         self.location_config = dai.SpatialLocationCalculatorConfigData()
         self.location_config.depthThresholds.lowerThreshold = 100
         self.location_config.depthThresholds.upperThreshold = 10000
+        self.location_algorigthm = dai.SpatialLocationCalculatorAlgorithm.MEDIAN
         self.location_config.roi = dai.Rect(
             dai.Point2f(0.48, 0.48), dai.Point2f(0.52, 0.52)
         )
 
-        self.location.setWaitForConfigInput(False)
+        self.location.inputConfig.setWaitForMessage(False)
         self.location.initialConfig.addROI(self.location_config)
 
     def setup_links(self) -> None:
@@ -85,11 +94,12 @@ class camera:
 
         self.left.out.link(self.stereo.left)
         self.right.out.link(self.stereo.right)
+        self.location.out.link(self.linkOut["location"].input)
 
         self.rgb.video.link(self.linkOut["rgb"].input)
 
-        self.stereo.depth.link(self.linkOut["location"].input)
-        self.stereo.passThrough.link(self.linkOut["stereo"].input)
+        self.stereo.depth.link(self.location.inputDepth)
+        self.location.passthroughDepth.link(self.linkOut["stereo"].input)
 
         self.linkIn["locationConfig"].out.link(self.location.inputConfig)
 
