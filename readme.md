@@ -14,4 +14,4 @@ Pour utiliser le programme, il suffit de lancer le script python.
 ```bash
 python main.py
 ```
-à l'approche d'un ArUco marker, la position de celui-ci sera affichée sur l'image. Les images des arUco marker sont disponibles dans le repertoire `images` et sont tirées de la librairie 'aruco.DICT_4X4_1000'.
+à l'approche d'un ArUco marker, la position de celui-ci sera affichée sur l'image. Les images des arUco marker sont disponibles dans le repertoire `aruco_marker` et sont tirées de la librairie 'aruco.DICT_4X4_1000'.
