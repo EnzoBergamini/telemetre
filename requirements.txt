@@ -2,4 +2,4 @@ depthai==2.25.0.0
 matplotlib==3.7.0
 numpy==1.24.2
 opencv-contrib-python==4.5.5.62
-opencv-python==4.10.0.82
+opencv-python==4.8.0.74
