@@ -8,8 +8,8 @@ class arucoDetector:
     def __init__(
         self,
         size_of_marker=0.05,
-        aruco_dict=aruco.Dictionary_get(aruco.DICT_4X4_1000),
-        detector_params=aruco.DetectorParameters_create(),
+        aruco_dict=aruco.getPredefinedDictionary(aruco.DICT_4X4_1000),
+        detector_params=aruco.DetectorParameters(),
     ) -> None:
 
         self.size_of_marker = size_of_marker
