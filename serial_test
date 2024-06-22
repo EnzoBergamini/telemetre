@@ -1,0 +1,53 @@
+import serial
+import time
+import re
+
+# Serial port configuration
+SERIAL_PORT = 'COM8'
+BAUD = 115200
+TIMEOUT = 1
+
+# Define a function to extract values
+def extract_values(s):
+    pattern = re.compile(r'([dD])(\d+\.\d+)[xX](\d+\.\d+)[yY](\d+\.\d+)[zZ](\d+\.\d+)')
+    match = pattern.search(s)
+    if match:
+        measure_1 = match.group(1) == 'd'
+        data = match.groups()
+        return data, measure_1
+    return None, None
+
+# Serial port configuration
+try:
+    serial_port = serial.Serial(
+        port=SERIAL_PORT, 
+        baudrate=BAUD,
+        timeout=TIMEOUT
+    )
+except serial.SerialException as e:
+    print(f"Error opening serial port: {e}")
+    exit()
+
+print(serial_port.name)
+
+Data_1 = None
+Data_2 = None
+
+try:
+    while True:
+        data_in = serial_port.readline()
+        data_str = data_in.decode('utf-8').rstrip()
+        data, measure_1 = extract_values(data_str)
+        if data:
+            if measure_1:
+                Data_1 = data
+            else:
+                Data_2 = data
+        print(f"Data 1: {Data_1}")
+        print(f"Data 2: {Data_2}")
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Program interrupted by user")
+finally:
+    serial_port.close()
+    print("Serial port closed")
